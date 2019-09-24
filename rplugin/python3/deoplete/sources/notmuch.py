@@ -13,10 +13,10 @@ class Source(Base):
     def __init__(self, vim):
         super().__init__(vim)
 
-        self.rank = 75  # default is 100, give deoplete-abook priority
+        self.rank = 101  # default is 100, give deoplete-abook priority
         self.name = 'notmuch'
-        self.mark = '[nm]'
-        self.min_pattern_length = 0
+        self.mark = '[notmuch]'
+        self.min_pattern_length = 2
         self.filetypes = ['mail']
         self.matchers = ['matcher_full_fuzzy', 'matcher_length']
 
@@ -25,7 +25,7 @@ class Source(Base):
                                            ['notmuch', 'address',
                                             '--format=sexp',
                                             '--output=recipients',
-                                            'tag:sent'])
+                                            context['input']])
 
     def get_complete_position(self, context):
         colon = self.COLON_PATTERN.search(context['input'])
@@ -47,5 +47,5 @@ class Source(Base):
         for row in command_results:
             regexp = self.SEXP_PATTERN.search(row.strip())
             if regexp:
-                results.append({'word': regexp.group("name_addr")})
+                results.append({'word': regexp.group("name_addr"), 'kind': 'email'})
         return results
